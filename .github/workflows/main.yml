@@ -109,7 +109,7 @@ jobs:
             push: true
             # Тут вместо username должен быть ваш логин на Docker Hub
             tags: ${{ secrets.DOCKER_USERNAME }}/taski_gateway:latest 
-      
+
         deploy:
       runs-on: ubuntu-latest
       needs: 
@@ -152,3 +152,4 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
             sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/ 
+          # Коммент для будущего коммита
