@@ -25,7 +25,9 @@ class TaskiAPITestCase(TestCase):
         self.assertEqual(str(task), 'Write tests')
 
     def test_delete_returns_no_content(self):
-        task = models.Task.objects.create(title='Remove', description='After reading')
+        task = models.Task.objects.create(
+            title='Remove', description='After reading'
+        )
         response = self.guest_client.delete(f'/api/tasks/{task.id}/')
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
         self.assertFalse(models.Task.objects.filter(pk=task.pk).exists())
