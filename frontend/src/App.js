@@ -4,24 +4,17 @@ import TaskEditModal from "./components/TaskEditModal";
 import Task from "./components/Task";
 import TabList from "./components/TabList";
 
-axios.interceptors.response.use(function (response) {
-  if (response.headers['content-type'] !== 'application/json') {
-    alert('unsupport data format in server response')
-    return Promise.reject(new Error('unsupport data format'));
-  }
-  return response;
-});
-
 const App = () => {
   const [isShowCompleted, setIsShowCompleted] = useState(false);
   const [taskList, setTaskList] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
+  const [error, setError] = useState("");
 
   const refreshList = () => {
     axios
       .get("/api/tasks/")
       .then((res) => setTaskList(res.data))
-      .catch(console.error);
+      .catch(() => setError("Could not load tasks."));
   };
 
   useEffect(() => {
@@ -34,18 +27,19 @@ const App = () => {
       : axios.post("/api/tasks/", item);
 
     request
-      .then((res) => {
+      .then(() => {
         refreshList();
         setActiveTask(null);
+        setError("");
       })
-      .catch(console.error);
+      .catch(() => setError("Could not save the task."));
   };
 
   const handleDelete = (item) => {
     axios
       .delete(`/api/tasks/${item.id}/`)
       .then(refreshList)
-      .catch(console.error);
+      .catch(() => setError("Could not delete the task."));
   };
 
   const createTask = () => {
@@ -59,6 +53,7 @@ const App = () => {
   return (
     <main className="container">
       <h1 className="text text-uppercase text-center my-4">Taski</h1>
+      {error && <p role="alert" className="alert alert-danger">{error}</p>}
       <div className="row">
         <div className="col-md-6 col-sm-10 mx-auto p-0">
           <div className="card p-3">

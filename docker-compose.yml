@@ -8,10 +8,20 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
       
   backend:
     build: ./backend/
     env_file: .env
+    environment:
+      STATIC_ROOT: /backend_static/static
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - static_volume:/backend_static/ # <-- ПРОБРОСИЛИ ТОМ В БЭКЕНД
 
@@ -28,3 +38,8 @@ services:
       - 8000:80
     volumes:
       - static_volume:/staticfiles/ # <-- ПРОБРОСИЛИ ТОМ В NGINX (GATEWAY)
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_completed_successfully

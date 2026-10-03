@@ -19,3 +19,13 @@ class TaskiAPITestCase(TestCase):
         response = self.guest_client.post('/api/tasks/', data=data)
         self.assertEqual(response.status_code, HTTPStatus.CREATED)
         self.assertTrue(models.Task.objects.filter(title='Test').exists())
+
+    def test_task_string_is_its_title(self):
+        task = models.Task(title='Write tests', description='Check model')
+        self.assertEqual(str(task), 'Write tests')
+
+    def test_delete_returns_no_content(self):
+        task = models.Task.objects.create(title='Remove', description='After reading')
+        response = self.guest_client.delete(f'/api/tasks/{task.id}/')
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+        self.assertFalse(models.Task.objects.filter(pk=task.pk).exists())
